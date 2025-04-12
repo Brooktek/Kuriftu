@@ -2,17 +2,15 @@ import { initializeApp } from "firebase/app"
 import { getFirestore, collection, addDoc } from "firebase/firestore"
 import { getAnalytics } from "firebase/analytics"
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD0r7w5VblpZw7dKxiz025zBLutqs-CXFo",
-  authDomain: "kuriftu-8b575.firebaseapp.com",
-  databaseURL: "https://kuriftu-8b575-default-rtdb.firebaseio.com",
-  projectId: "kuriftu-8b575",
-  storageBucket: "kuriftu-8b575.firebasestorage.app",
-  messagingSenderId: "244379447955",
-  appId: "1:244379447955:web:44dcde733eb0522d435366",
-  measurementId: "G-9PZ5ZG88WH",
-}
+  apiKey: "AIzaSyDIjyrXtC3yd-7Qyq_ajOoMLGIgLEZ-ehA",
+  authDomain: "kuriftu-b32b6.firebaseapp.com",
+  projectId: "kuriftu-b32b6",
+  storageBucket: "kuriftu-b32b6.firebasestorage.app",
+  messagingSenderId: "596198177911",
+  appId: "1:596198177911:web:9842ad3c2f0d2485b95a72",
+  measurementId: "G-JZP3FPXQ24"
+};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
