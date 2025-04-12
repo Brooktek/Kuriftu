@@ -1,18 +1,29 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore, collection, addDoc } from "firebase/firestore"
+import { getAnalytics } from "firebase/analytics"
 
-// Your Firebase configuration
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyD0r7w5VblpZw7dKxiz025zBLutqs-CXFo",
+  authDomain: "kuriftu-8b575.firebaseapp.com",
+  databaseURL: "https://kuriftu-8b575-default-rtdb.firebaseio.com",
+  projectId: "kuriftu-8b575",
+  storageBucket: "kuriftu-8b575.firebasestorage.app",
+  messagingSenderId: "244379447955",
+  appId: "1:244379447955:web:44dcde733eb0522d435366",
+  measurementId: "G-9PZ5ZG88WH",
 }
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
+
+// Initialize Analytics - only in browser environment
+let analytics = null
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app)
+}
+
+// Initialize Firestore
 const db = getFirestore(app)
 
 // Add a registration to Firestore
@@ -26,3 +37,5 @@ export async function addRegistration(collectionName: string, data: any) {
     throw error
   }
 }
+
+export { app, analytics }
