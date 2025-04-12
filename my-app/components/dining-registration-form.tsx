@@ -3,22 +3,8 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { DatePicker } from "@/components/date-picker"
 import { addRegistration } from "@/lib/firebase"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/components/toast"
 
 interface DiningRegistrationFormProps {
   onClose: () => void
@@ -26,37 +12,24 @@ interface DiningRegistrationFormProps {
 
 export default function DiningRegistrationForm({ onClose }: DiningRegistrationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
   const [formData, setFormData] = useState({
     fullName: "",
-    date: undefined as Date | undefined,
+    date: "",
     time: "",
     numberOfGuests: "2",
     specialRequests: "",
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleDateChange = (date: Date | undefined) => {
-    setFormData((prev) => ({ ...prev, date }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.fullName || !formData.date || !formData.time) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      })
+      toast("Error", "Please fill in all required fields", "error")
       return
     }
 
@@ -65,118 +38,101 @@ export default function DiningRegistrationForm({ onClose }: DiningRegistrationFo
     try {
       await addRegistration("dining-registrations", {
         ...formData,
-        date: formData.date?.toISOString(),
         timestamp: new Date().toISOString(),
       })
 
-      toast({
-        title: "Success",
-        description: "Your dining reservation has been submitted",
-      })
-
+      toast("Success", "Your dining reservation has been submitted")
       onClose()
     } catch (error) {
       console.error("Error submitting form:", error)
-      toast({
-        title: "Error",
-        description: "Failed to submit reservation. Please try again.",
-        variant: "destructive",
-      })
+      toast("Error", "Failed to submit reservation. Please try again.", "error")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Dining Reservation</DialogTitle>
-          <DialogDescription>Book a table at our restaurant</DialogDescription>
-        </DialogHeader>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title">Dining Reservation</h2>
+          <p className="modal-description">Book a table at our restaurant</p>
+          <button className="close-button" onClick={onClose}>
+            &times;
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              required
-            />
-          </div>
+        <div className="modal-content">
+          <form onSubmit={handleSubmit} className="form">
+            <div className="form-group">
+              <label htmlFor="fullName">Full Name</label>
+              <input
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label>Date</Label>
-            <DatePicker date={formData.date} onDateChange={handleDateChange} />
-          </div>
+            <div className="form-group">
+              <label htmlFor="date">Date</label>
+              <input type="date" id="date" name="date" value={formData.date} onChange={handleChange} required />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="time">Preferred Time</Label>
-            <Select value={formData.time} onValueChange={(value) => handleSelectChange("time", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="18:00">6:00 PM</SelectItem>
-                <SelectItem value="18:30">6:30 PM</SelectItem>
-                <SelectItem value="19:00">7:00 PM</SelectItem>
-                <SelectItem value="19:30">7:30 PM</SelectItem>
-                <SelectItem value="20:00">8:00 PM</SelectItem>
-                <SelectItem value="20:30">8:30 PM</SelectItem>
-                <SelectItem value="21:00">9:00 PM</SelectItem>
-                <SelectItem value="21:30">9:30 PM</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="form-group">
+              <label htmlFor="time">Preferred Time</label>
+              <select id="time" name="time" value={formData.time} onChange={handleChange} required>
+                <option value="">Select time</option>
+                <option value="18:00">6:00 PM</option>
+                <option value="18:30">6:30 PM</option>
+                <option value="19:00">7:00 PM</option>
+                <option value="19:30">7:30 PM</option>
+                <option value="20:00">8:00 PM</option>
+                <option value="20:30">8:30 PM</option>
+                <option value="21:00">9:00 PM</option>
+                <option value="21:30">9:30 PM</option>
+              </select>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="numberOfGuests">Number of Guests</Label>
-            <Select
-              value={formData.numberOfGuests}
-              onValueChange={(value) => handleSelectChange("numberOfGuests", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select number of guests" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1</SelectItem>
-                <SelectItem value="2">2</SelectItem>
-                <SelectItem value="3">3</SelectItem>
-                <SelectItem value="4">4</SelectItem>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="6">6</SelectItem>
-                <SelectItem value="7">7</SelectItem>
-                <SelectItem value="8">8</SelectItem>
-                <SelectItem value="9">9+</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="form-group">
+              <label htmlFor="numberOfGuests">Number of Guests</label>
+              <select id="numberOfGuests" name="numberOfGuests" value={formData.numberOfGuests} onChange={handleChange}>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9+</option>
+              </select>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="specialRequests">Special Requests (optional)</Label>
-            <Textarea
-              id="specialRequests"
-              name="specialRequests"
-              value={formData.specialRequests}
-              onChange={handleChange}
-              placeholder="Dietary restrictions, special occasions, etc."
-              className="min-h-[100px]"
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="specialRequests">Special Requests (optional)</label>
+              <textarea
+                id="specialRequests"
+                name="specialRequests"
+                value={formData.specialRequests}
+                onChange={handleChange}
+                placeholder="Dietary restrictions, special occasions, etc."
+              />
+            </div>
+          </form>
+        </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="modal-footer">
+          <button type="button" className="button button-outline" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="button button-primary" onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

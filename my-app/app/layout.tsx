@@ -1,6 +1,6 @@
 import type React from "react"
-import "@/app/globals.css"
-import { Toaster } from "@/components/ui/toaster"
+import "./styles.css"
+import { ToastContainer } from "@/components/toast"
 
 export default function RootLayout({
   children,
@@ -11,15 +11,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <Toaster />
+        <ToastContainer />
       </body>
     </html>
   )
 }
-
-
-import './globals.css'
-
-export const metadata = {
-      generator: 'v0.dev'
-    };
